@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.blob-main {
+    border-radius: 10% 10% 25% 15% / 10% 10% 20% 10%;
+
+    height: 150px;
+    width: 100px;
+    background: white;
+
+}

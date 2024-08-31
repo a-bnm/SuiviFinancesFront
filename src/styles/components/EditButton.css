@@ -1,0 +1,11 @@
+.btnEdit {
+    background: linear-gradient(to left, #ffffff 50%, #4D35D6 50%) right;
+    background-size: 200%;
+    transition: .5s ease-out;
+
+}
+
+.btnEdit:hover {
+    background-position: left;
+    color: #ffffff;
+}
