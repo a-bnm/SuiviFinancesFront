@@ -4,7 +4,7 @@ import axios from "@/lib/axios";
 export const useComptes = () => {
 
     //recuperer les comptes
-    const { data: comptes, isLoading, error, mutate } = useSWR('/api/v1/comptes', () =>
+    const { data: comptes, isLoading, isValidating, error, mutate } = useSWR('/api/v1/comptes', () =>
         axios
             .get('/api/v1/comptes')
             .then(response => response.data.data)
@@ -14,6 +14,21 @@ export const useComptes = () => {
             }),
     )
 
+    //recuperer un comptes
+    const getCompte = async (id) => {
+        let compte = await axios
+            .get(`/api/v1/comptes/${id}`)
+            .then(response => {
+                return response.data.data
+            })
+            .catch(error => {
+
+                if (error.response.status === 500) throw error
+                return error
+            })
+
+        return compte
+    }
 
     //ajout d'un compte
     const ajoutCompte = async ({ setErrors, ...props }) => {
@@ -26,43 +41,24 @@ export const useComptes = () => {
                 return response.data.message
             })
             .catch((error) => {
-                console.log(error.response.data)
+                setErrors(error.response.data.errors)
             })
 
         return message
     }
 
     //modification d'un compte
-    const editCompte = async ({ setErrors, ...props }) => {
+    const modifCompte = async (id, { setErrors, ...props }) => {
         setErrors([])
 
 
         const message = axios
-            .patch('/api/v1/comptes', props)
+            .patch(`/api/v1/comptes/${id}`, props)
             .then((response) => {
-                mutate();
                 return response.data.message
             })
             .catch((error) => {
-                console.log(error.response.data)
-            })
-
-        return message
-    }
-
-    //modification d'un compte
-    const modifCompte = async ({ setErrors, ...props }) => {
-        setErrors([])
-
-
-        const message = axios
-            .patch('/api/v1/comptes', props)
-            .then((response) => {
-                mutate();
-                return response.data.message
-            })
-            .catch((error) => {
-                console.log(error.response.data)
+                setErrors(error.response.data.errors)
             })
 
         return message
@@ -86,8 +82,10 @@ export const useComptes = () => {
 
     return {
         comptes,
+        getCompte,
         error,
         isLoading,
+        isValidating,
         ajoutCompte,
         modifCompte,
         supprimerCompte

@@ -16,7 +16,7 @@ const Navigation = ({ user }) => {
     const [open, setOpen] = useState(false)
 
     return (
-        <nav className="bg-white border-b border-gray-100">
+        <nav className="bg-primary-100 border-b border-gray text-white">
             {/* Primary Navigation Menu */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
@@ -24,7 +24,7 @@ const Navigation = ({ user }) => {
                         {/* Logo */}
                         <div className="flex-shrink-0 flex items-center">
                             <Link href="/dashboard">
-                                <ApplicationLogo className="block h-10 w-auto fill-current text-gray-600" />
+                                <ApplicationLogo className="block h-10 w-auto fill-current text-white" />
                             </Link>
                         </div>
 
@@ -34,6 +34,11 @@ const Navigation = ({ user }) => {
                                 href="/dashboard"
                                 active={usePathname() === '/dashboard'}>
                                 Dashboard
+                            </NavLink>
+                            <NavLink
+                                href="/admin/categories"
+                                active={usePathname() === '/admin/categories'}>
+                                Categories
                             </NavLink>
                             <NavLink
                                 href="/admin/comptes"

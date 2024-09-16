@@ -1,6 +1,7 @@
 "use client";
 
 import { useComptes } from '@/hooks/comptes'
+import { useCategories } from '@/hooks/categories'
 import Loading from '../Loading';
 import TrHead from "@/components/tables/TrHead";
 import TrBody from "@/components/tables/TrBody";
@@ -10,19 +11,31 @@ import EditButton from '@/components/buttons/EditButton';
 import DeleteButton from '@/components/buttons/DeleteButton';
 import NoInfo from '@/components/NoInfo';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 function page() {
-    const router = useRouter();
-    const { comptes, isLoading, supprimerCompte } = useComptes();
+    const { comptes, isLoading, isValidating, supprimerCompte } = useComptes();
+    const { categories, supprimerCategorie } = useCategories();
     const [errors, setErrors] = useState([]);
 
-    const handleDelete = (e, id) => {
+    const router = useRouter();
+    const handleDelete = (e, table, id) => {
         e.preventDefault();
         setErrors([]);
         let response = confirm("Voulez vous vraiment supprimer cet élément?");
         if (response) {
-            supprimerCompte({ setErrors, id });
+            switch (table) {
+                case "compte":
+                    supprimerCompte({ setErrors, id });
+                    break;
+                case "categorie":
+                    supprimerCategorie({ setErrors, id });
+                    break;
+                default:
+                    supprimerCategorie({ setErrors, id });
+                    break;
+            }
+
         }
     }
     const handleEdit = (e, id) => {
@@ -42,17 +55,52 @@ function page() {
 
     return (
         <>
-            {isLoading && comptes === undefined ?
+            {isLoading || isValidating ?
                 (
                     <Loading />
-                ) : (
+                ) :
+                (
                     <div className="py-12">
                         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                             <div className="grid grid-cols-3 overflow-hidden ">
+                                <div className='col-span-1 my-4'>
+                                    <div className=' p-4 bg-white shadow-md rounded-md'>
+                                        {categories?.length > 0 ?
+                                            (
+                                                <Table title="Catégories">
+                                                    <thead>
+                                                        <TrHead>
+                                                            <Th width="45%">Désignation</Th>
+                                                            <Th width="45%">Description</Th>
+                                                            <Th width="10%">Supprimer</Th>
+                                                        </TrHead>
+                                                    </thead>
+                                                    <tbody>
+                                                        {categories?.map((categorie) => {
+                                                            return (
+                                                                <TrBody key={categorie.id}>
+                                                                    <td>{categorie.designation}</td>
+                                                                    <td>{categorie.description}</td>
+                                                                    <td>
+                                                                        <DeleteButton handleClick={(e) => handleDelete(e, "categorie", categorie.id)} />
+                                                                    </td>
+                                                                </TrBody>
+                                                            )
+                                                        })
+                                                        }
+                                                    </tbody>
+                                                </Table>
+
+                                            ) : (
+                                                <NoInfo />
+                                            )
+
+                                        }
+                                    </div>
+                                </div>
                                 <div className='col-span-3 p-4 bg-white shadow-md rounded-md'>
                                     {comptes?.length > 0 ?
                                         (
-
                                             <Table title="Mes comptes">
                                                 <thead>
                                                     <TrHead>
@@ -74,7 +122,7 @@ function page() {
                                                                     <EditButton handleClick={(e) => handleEdit(e, compte.id)} />
                                                                 </td>
                                                                 <td>
-                                                                    <DeleteButton handleClick={(e) => handleDelete(e, compte.id)} />
+                                                                    <DeleteButton handleClick={(e) => handleDelete(e, "compte", compte.id)} />
                                                                 </td>
                                                             </TrBody>
                                                         )
